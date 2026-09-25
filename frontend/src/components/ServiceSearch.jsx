@@ -1,28 +1,39 @@
-import { Search, X } from "lucide-react";
+import {
+  Sparkles,
+  Code2,
+  Palette,
+  PenTool,
+  BarChart3,
+  Megaphone,
+} from "lucide-react";
 
-function ServiceSearch({ searchTerm, setSearchTerm }) {
+const icons = {
+  "All Services": Sparkles,
+  "AI & Automation": Sparkles,
+  Development: Code2,
+  Design: Palette,
+  Content: PenTool,
+  "Data & Analytics": BarChart3,
+  Marketing: Megaphone,
+};
+
+function ServiceCategoryCard({
+  category,
+  activeCategory,
+  onClick,
+}) {
+  const Icon = icons[category] || Sparkles;
+  const isActive = activeCategory === category;
+
   return (
-    <div className="service-search-wrapper">
-      <Search className="search-icon" size={21} />
-
-      <input
-        type="text"
-        placeholder="Search services..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      {searchTerm && (
-        <button
-          className="clear-search"
-          onClick={() => setSearchTerm("")}
-          aria-label="Clear search"
-        >
-          <X size={18} />
-        </button>
-      )}
-    </div>
+    <button
+      className={`category-filter ${isActive ? "active" : ""}`}
+      onClick={() => onClick(category)}
+    >
+      <Icon size={18} />
+      <span>{category}</span>
+    </button>
   );
 }
 
-export default ServiceSearch;
+export default ServiceCategoryCard;

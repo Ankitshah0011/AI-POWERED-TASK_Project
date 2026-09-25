@@ -521,7 +521,7 @@
   position: absolute;
   top: 16px;
   right: 18px;
-  color: #d9e7f5;
+  color: black;
   font-size: 28px;
   font-weight: 800;
 }
@@ -698,4 +698,138 @@
   .view-service-btn {
     justify-content: center;
   }
+}
+/* =========================================================
+   INFINITE SERVICES MARQUEE
+   Keeps the existing service-card design unchanged
+   ========================================================= */
+
+.services-marquee {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 10px 0 30px;
+}
+
+/* Soft fade at the left and right edges */
+.services-marquee::before,
+.services-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.services-marquee::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    #ffffff,
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.services-marquee::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    #ffffff,
+    rgba(255, 255, 255, 0)
+  );
+}
+
+
+/* Moving track */
+.services-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 28px;
+
+  animation: servicesMarquee 65s linear infinite;
+
+  will-change: transform;
+}
+
+
+/* Individual card wrapper */
+.service-marquee-item {
+  flex: 0 0 380px;
+  width: 380px;
+}
+
+
+/* Keep your existing ServiceCard untouched */
+.service-marquee-item .service-card {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* Pause when user hovers */
+.services-marquee:hover .services-marquee-track {
+  animation-play-state: paused;
+}
+
+
+/* Infinite movement */
+@keyframes servicesMarquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(
+      calc(-50% - 14px)
+    );
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1024px) {
+
+  .service-marquee-item {
+    flex-basis: 340px;
+    width: 340px;
+  }
+
+  .services-marquee-track {
+    gap: 22px;
+    animation-duration: 40s;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .services-marquee {
+    padding-bottom: 20px;
+  }
+
+  .service-marquee-item {
+    flex-basis: 300px;
+    width: 300px;
+  }
+
+  .services-marquee-track {
+    gap: 18px;
+    animation-duration: 35s;
+  }
+
+  .services-marquee::before,
+  .services-marquee::after {
+    width: 40px;
+  }
+
 }
