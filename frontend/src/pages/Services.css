@@ -1,7 +1,11 @@
 /* =========================================================
+
    SERVICES PAGE
+
    AI Task Marketplace
+
    Existing Blue / Navy Theme
+
    ========================================================= */
 
 .services-page {
@@ -10,18 +14,21 @@
   color: #102a43;
 }
 
+
 /* =========================================================
    HERO
    ========================================================= */
 
 .services-hero {
   padding: 75px 24px 65px;
+
   background:
     linear-gradient(
       180deg,
       #ffffff 0%,
       #f7faff 100%
     );
+
   text-align: center;
 }
 
@@ -34,22 +41,33 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+
   padding: 8px 14px;
+
   border-radius: 999px;
+
   background: #edf5ff;
   color: #2374e1;
+
   font-size: 12px;
   font-weight: 700;
+
   letter-spacing: 0.08em;
+
   margin-bottom: 22px;
 }
 
 .services-hero h1 {
   margin: 0;
+
   font-size: clamp(42px, 6vw, 68px);
+
   line-height: 1.05;
+
   letter-spacing: -0.04em;
+
   color: #102a43;
+
   font-weight: 800;
 }
 
@@ -59,11 +77,16 @@
 
 .services-hero p {
   max-width: 650px;
+
   margin: 22px auto 0;
+
   color: #627d98;
+
   font-size: 17px;
+
   line-height: 1.7;
 }
+
 
 /* =========================================================
    MAIN SERVICES SECTION
@@ -71,33 +94,48 @@
 
 .services-section {
   max-width: 1250px;
+
   margin: 0 auto;
+
   padding: 70px 24px 90px;
 }
 
 .services-toolbar {
   display: flex;
+
   justify-content: space-between;
+
   align-items: flex-end;
+
   gap: 30px;
+
   margin-bottom: 32px;
 }
 
 .section-label {
   display: block;
+
   color: #2477ed;
+
   font-size: 12px;
+
   font-weight: 800;
+
   letter-spacing: 0.1em;
+
   margin-bottom: 8px;
 }
 
 .services-toolbar h2 {
   margin: 0;
+
   color: #102a43;
+
   font-size: 30px;
+
   letter-spacing: -0.025em;
 }
+
 
 /* =========================================================
    SEARCH
@@ -105,20 +143,31 @@
 
 .service-search-wrapper {
   width: min(100%, 360px);
+
   position: relative;
 }
 
 .service-search-wrapper input {
   width: 100%;
+
   height: 52px;
+
   padding: 0 46px;
+
   border: 1px solid #d9e5f2;
+
   border-radius: 12px;
+
   background: #ffffff;
+
   color: #102a43;
+
   font-size: 14px;
+
   outline: none;
+
   box-sizing: border-box;
+
   transition: 0.2s ease;
 }
 
@@ -128,27 +177,41 @@
 
 .service-search-wrapper input:focus {
   border-color: #2477ed;
-  box-shadow: 0 0 0 4px rgba(36, 119, 237, 0.1);
+
+  box-shadow:
+    0 0 0 4px rgba(36, 119, 237, 0.1);
 }
 
 .search-icon {
   position: absolute;
+
   left: 16px;
+
   top: 16px;
+
   color: #829ab1;
 }
 
 .clear-search {
   position: absolute;
+
   right: 12px;
+
   top: 12px;
+
   width: 28px;
+
   height: 28px;
+
   border: none;
+
   background: transparent;
+
   color: #829ab1;
+
   cursor: pointer;
 }
+
 
 /* =========================================================
    CATEGORY FILTERS
@@ -156,39 +219,61 @@
 
 .category-filters {
   display: flex;
+
   gap: 10px;
+
   flex-wrap: wrap;
+
   padding-bottom: 30px;
+
   border-bottom: 1px solid #e8f0f7;
 }
 
 .category-filter {
   display: inline-flex;
+
   align-items: center;
+
   gap: 8px;
+
   padding: 11px 16px;
+
   border: 1px solid #d9e5f2;
+
   border-radius: 9px;
+
   background: #ffffff;
+
   color: #486581;
+
   font-size: 13px;
+
   font-weight: 600;
+
   cursor: pointer;
+
   transition: all 0.2s ease;
 }
 
 .category-filter:hover {
   border-color: #2477ed;
+
   color: #2477ed;
+
   transform: translateY(-1px);
 }
 
 .category-filter.active {
   border-color: #2477ed;
+
   background: #2477ed;
+
   color: #ffffff;
-  box-shadow: 0 5px 15px rgba(36, 119, 237, 0.18);
+
+  box-shadow:
+    0 5px 15px rgba(36, 119, 237, 0.18);
 }
+
 
 /* =========================================================
    RESULTS
@@ -196,14 +281,19 @@
 
 .services-result-row {
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
+
   margin: 30px 0 20px;
 }
 
 .services-result-row p {
   margin: 0;
+
   color: #829ab1;
+
   font-size: 14px;
 }
 
@@ -213,12 +303,18 @@
 
 .clear-filters {
   border: none;
+
   background: transparent;
+
   color: #2477ed;
+
   font-size: 13px;
+
   font-weight: 700;
+
   cursor: pointer;
 }
+
 
 /* =========================================================
    SERVICE GRID
@@ -226,9 +322,13 @@
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
   gap: 24px;
 }
+
 
 /* =========================================================
    SERVICE CARD
@@ -236,10 +336,16 @@
 
 .service-card {
   overflow: hidden;
+
   background: #ffffff;
+
   border: 1px solid #e1eaf2;
+
   border-radius: 16px;
-  box-shadow: 0 5px 20px rgba(16, 42, 67, 0.05);
+
+  box-shadow:
+    0 5px 20px rgba(16, 42, 67, 0.05);
+
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease,
@@ -248,9 +354,13 @@
 
 .service-card:hover {
   transform: translateY(-6px);
+
   border-color: #c9dcf1;
-  box-shadow: 0 16px 35px rgba(16, 42, 67, 0.1);
+
+  box-shadow:
+    0 16px 35px rgba(16, 42, 67, 0.1);
 }
+
 
 /* =========================================================
    CARD VISUAL
@@ -258,58 +368,112 @@
 
 .service-card-visual {
   height: 195px;
+
   position: relative;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   overflow: hidden;
 }
 
 .visual-content {
-  background: linear-gradient(135deg, #eaf4ff, #cfe5ff);
+  background:
+    linear-gradient(
+      135deg,
+      #eaf4ff,
+      #cfe5ff
+    );
 }
 
 .visual-image {
-  background: linear-gradient(135deg, #eef0ff, #dbe2ff);
+  background:
+    linear-gradient(
+      135deg,
+      #eef0ff,
+      #dbe2ff
+    );
 }
 
 .visual-development {
-  background: linear-gradient(135deg, #e7f7ff, #ccecff);
+  background:
+    linear-gradient(
+      135deg,
+      #e7f7ff,
+      #ccecff
+    );
 }
 
 .visual-ai {
-  background: linear-gradient(135deg, #eaf8f7, #d1f0ee);
+  background:
+    linear-gradient(
+      135deg,
+      #eaf8f7,
+      #d1f0ee
+    );
 }
 
 .visual-data {
-  background: linear-gradient(135deg, #eef7ff, #d7eaff);
+  background:
+    linear-gradient(
+      135deg,
+      #eef7ff,
+      #d7eaff
+    );
 }
 
 .visual-design {
-  background: linear-gradient(135deg, #f0efff, #dedbff);
+  background:
+    linear-gradient(
+      135deg,
+      #f0efff,
+      #dedbff
+    );
 }
 
 .visual-ml {
-  background: linear-gradient(135deg, #e9f5ff, #d1e8ff);
+  background:
+    linear-gradient(
+      135deg,
+      #e9f5ff,
+      #d1e8ff
+    );
 }
 
 .visual-marketing {
-  background: linear-gradient(135deg, #edf5ff, #d8e9ff);
+  background:
+    linear-gradient(
+      135deg,
+      #edf5ff,
+      #d8e9ff
+    );
 }
 
 .visual-pattern {
   position: absolute;
+
   width: 260px;
+
   height: 260px;
-  border: 1px solid rgba(36, 119, 237, 0.1);
+
+  border:
+    1px solid rgba(36, 119, 237, 0.1);
+
   border-radius: 50%;
 }
 
 .visual-pattern::before,
 .visual-pattern::after {
   content: "";
+
   position: absolute;
-  border: 1px solid rgba(36, 119, 237, 0.1);
+
+  border:
+    1px solid rgba(36, 119, 237, 0.1);
+
   border-radius: 50%;
 }
 
@@ -323,30 +487,53 @@
 
 .service-visual-icon {
   position: relative;
+
   z-index: 2;
+
   width: 82px;
+
   height: 82px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.88);
+
+  background:
+    rgba(255, 255, 255, 0.88);
+
   color: #2477ed;
-  box-shadow: 0 12px 30px rgba(16, 42, 67, 0.1);
+
+  box-shadow:
+    0 12px 30px rgba(16, 42, 67, 0.1);
 }
 
 .service-category-badge {
   position: absolute;
+
   top: 15px;
+
   left: 15px;
+
   z-index: 3;
+
   padding: 7px 11px;
+
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.9);
+
+  background:
+    rgba(255, 255, 255, 0.9);
+
   color: #2477ed;
+
   font-size: 11px;
+
   font-weight: 700;
 }
+
 
 /* =========================================================
    CARD CONTENT
@@ -358,74 +545,111 @@
 
 .service-card-content h3 {
   margin: 0 0 10px;
+
   color: #102a43;
+
   font-size: 19px;
+
   line-height: 1.35;
 }
 
 .service-description {
   min-height: 66px;
+
   margin: 0 0 15px;
+
   color: #627d98;
+
   font-size: 13px;
+
   line-height: 1.65;
 }
 
 .service-rating {
   display: flex;
+
   align-items: center;
+
   gap: 5px;
+
   margin-bottom: 19px;
+
   color: #2477ed;
+
   font-size: 13px;
+
   font-weight: 700;
 }
 
 .review-count {
   color: #829ab1;
+
   font-weight: 500;
 }
 
 .service-card-bottom {
   display: flex;
+
   justify-content: space-between;
+
   align-items: flex-end;
+
   gap: 10px;
+
   padding-top: 17px;
-  border-top: 1px solid #edf2f7;
+
+  border-top:
+    1px solid #edf2f7;
 }
 
 .starting-label {
   display: block;
+
   margin-bottom: 3px;
+
   color: #829ab1;
+
   font-size: 10px;
 }
 
 .service-card-bottom strong {
   color: #102a43;
+
   font-size: 20px;
 }
 
 .view-service-btn {
   display: inline-flex;
+
   align-items: center;
+
   gap: 6px;
+
   padding: 9px 12px;
+
   border: none;
+
   border-radius: 8px;
+
   background: #2477ed;
+
   color: #ffffff;
+
   font-size: 12px;
+
   font-weight: 700;
+
   cursor: pointer;
+
   transition: 0.2s ease;
 }
 
 .view-service-btn:hover {
   background: #1768d5;
+
   transform: translateX(2px);
 }
+
 
 /* =========================================================
    EMPTY STATE
@@ -433,44 +657,67 @@
 
 .empty-services {
   padding: 80px 20px;
+
   text-align: center;
-  border: 1px dashed #cbd8e5;
+
+  border:
+    1px dashed #cbd8e5;
+
   border-radius: 16px;
+
   background: #f9fbfd;
 }
 
 .empty-icon {
   width: 65px;
+
   height: 65px;
+
   margin: 0 auto 18px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   border-radius: 18px;
+
   background: #edf5ff;
+
   color: #2477ed;
 }
 
 .empty-services h3 {
   margin: 0 0 8px;
+
   color: #102a43;
+
   font-size: 22px;
 }
 
 .empty-services p {
   margin: 0 0 22px;
+
   color: #829ab1;
 }
 
 .primary-btn {
   padding: 11px 18px;
+
   border: none;
+
   border-radius: 8px;
+
   background: #2477ed;
+
   color: white;
+
   font-weight: 700;
+
   cursor: pointer;
 }
+
 
 /* =========================================================
    HOW IT WORKS
@@ -478,78 +725,118 @@
 
 .how-it-works {
   padding: 90px 24px;
+
   background: #f7faff;
-  border-top: 1px solid #edf3f8;
+
+  border-top:
+    1px solid #edf3f8;
 }
 
 .section-heading {
   max-width: 650px;
+
   margin: 0 auto 45px;
+
   text-align: center;
 }
 
 .section-heading h2 {
   margin: 0 0 10px;
+
   color: #102a43;
+
   font-size: 34px;
 }
 
 .section-heading p {
   margin: 0;
+
   color: #627d98;
 }
 
 .steps-grid {
   max-width: 1050px;
+
   margin: 0 auto;
+
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
   gap: 25px;
 }
 
 .step-card {
   position: relative;
+
   padding: 30px;
+
   text-align: center;
+
   background: #ffffff;
-  border: 1px solid #e1eaf2;
+
+  border:
+    1px solid #e1eaf2;
+
   border-radius: 15px;
-  box-shadow: 0 5px 18px rgba(16, 42, 67, 0.04);
+
+  box-shadow:
+    0 5px 18px rgba(16, 42, 67, 0.04);
 }
 
 .step-number {
   position: absolute;
+
   top: 16px;
+
   right: 18px;
+
   color: black;
+
   font-size: 28px;
+
   font-weight: 800;
 }
 
 .step-icon {
   width: 58px;
+
   height: 58px;
+
   margin: 0 auto 20px;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   border-radius: 15px;
+
   background: #edf5ff;
+
   color: #2477ed;
 }
 
 .step-card h3 {
   margin: 0 0 9px;
+
   color: #102a43;
+
   font-size: 18px;
 }
 
 .step-card p {
   margin: 0;
+
   color: #627d98;
+
   font-size: 13px;
+
   line-height: 1.6;
 }
+
 
 /* =========================================================
    CTA
@@ -557,60 +844,87 @@
 
 .services-cta {
   max-width: 1200px;
+
   margin: 70px auto;
+
   padding: 65px 30px;
+
   border-radius: 22px;
-  background: linear-gradient(
-    135deg,
-    #102a43,
-    #174a7c
-  );
+
+  background:
+    linear-gradient(
+      135deg,
+      #102a43,
+      #174a7c
+    );
+
   text-align: center;
+
   overflow: hidden;
 }
 
 .cta-content {
   max-width: 650px;
+
   margin: 0 auto;
 }
 
 .cta-label {
   color: #8fc1ff;
+
   font-size: 11px;
+
   font-weight: 800;
+
   letter-spacing: 0.1em;
 }
 
 .cta-content h2 {
   margin: 10px 0;
+
   color: #ffffff;
+
   font-size: 36px;
 }
 
 .cta-content p {
   margin: 0 auto 25px;
+
   color: #d4e4f3;
+
   line-height: 1.6;
 }
 
 .cta-button {
   display: inline-flex;
+
   align-items: center;
+
   gap: 8px;
+
   padding: 13px 20px;
+
   border: none;
+
   border-radius: 9px;
+
   background: #2477ed;
+
   color: #ffffff;
+
   font-weight: 700;
+
   cursor: pointer;
+
   transition: 0.2s ease;
 }
 
 .cta-button:hover {
   background: #3688f7;
+
   transform: translateY(-2px);
 }
+
 
 /* =========================================================
    RESPONSIVE
@@ -618,19 +932,23 @@
 
 @media (max-width: 1050px) {
   .services-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
   .services-toolbar {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
   .service-search-wrapper {
     width: 100%;
+
     max-width: 500px;
   }
 }
+
 
 @media (max-width: 750px) {
   .services-hero {
@@ -638,7 +956,8 @@
   }
 
   .services-section {
-    padding: 55px 18px 70px;
+    padding:
+      55px 18px 70px;
   }
 
   .services-grid {
@@ -651,7 +970,9 @@
 
   .category-filters {
     overflow-x: auto;
+
     flex-wrap: nowrap;
+
     padding-bottom: 15px;
   }
 
@@ -664,14 +985,18 @@
   }
 
   .services-cta {
-    margin: 45px 18px;
-    padding: 50px 22px;
+    margin:
+      45px 18px;
+
+    padding:
+      50px 22px;
   }
 
   .cta-content h2 {
     font-size: 30px;
   }
 }
+
 
 @media (max-width: 480px) {
   .services-hero h1 {
@@ -692,6 +1017,7 @@
 
   .service-card-bottom {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -699,137 +1025,230 @@
     justify-content: center;
   }
 }
+
+
 /* =========================================================
-   INFINITE SERVICES MARQUEE
-   Keeps the existing service-card design unchanged
+   SERVICES AUTO CAROUSEL
+
+   IMPORTANT:
+
+   This replaces the old CSS marquee animation.
+
+   React/JavaScript now controls movement so:
+
+   1. Cards move automatically
+   2. Mouse wheel works
+   3. Trackpad works
+   4. Click + drag works
+   5. Infinite loop works
+
+   Existing card design is NOT changed.
    ========================================================= */
 
 .services-marquee {
   width: 100%;
-  overflow: hidden;
+
+  /*
+    IMPORTANT:
+    JavaScript changes scrollLeft.
+    Therefore horizontal overflow must be enabled.
+  */
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
   position: relative;
-  padding: 10px 0 30px;
+
+  padding:
+    10px 0 30px;
+
+  cursor: grab;
+
+  /*
+    Hide scrollbar.
+  */
+  scrollbar-width: none;
+
+  -ms-overflow-style: none;
+
+  /*
+    Prevent browser overscroll from
+    affecting the page while interacting.
+  */
+  overscroll-behavior-x: contain;
+
+  /*
+    Prevent accidental text selection
+    while dragging.
+  */
+  user-select: none;
+
+  -webkit-user-select: none;
 }
 
-/* Soft fade at the left and right edges */
+
+/*
+  Hide Chrome / Safari scrollbar.
+*/
+
+.services-marquee::-webkit-scrollbar {
+  display: none;
+}
+
+
+/*
+  Cursor while dragging.
+*/
+
+.services-marquee.is-dragging {
+  cursor: grabbing;
+}
+
+
+/* =========================================================
+   LEFT / RIGHT FADE
+   ========================================================= */
+
 .services-marquee::before,
 .services-marquee::after {
   content: "";
+
   position: absolute;
+
   top: 0;
+
   bottom: 0;
+
   width: 90px;
+
   z-index: 5;
+
   pointer-events: none;
 }
 
 .services-marquee::before {
   left: 0;
-  background: linear-gradient(
-    to right,
-    #ffffff,
-    rgba(255, 255, 255, 0)
-  );
+
+  background:
+    linear-gradient(
+      to right,
+      #ffffff,
+      rgba(255, 255, 255, 0)
+    );
 }
 
 .services-marquee::after {
   right: 0;
-  background: linear-gradient(
-    to left,
-    #ffffff,
-    rgba(255, 255, 255, 0)
-  );
-}
 
-
-/* Moving track */
-.services-marquee-track {
-  display: flex;
-  width: max-content;
-  gap: 28px;
-
-  animation: servicesMarquee 65s linear infinite;
-
-  will-change: transform;
-}
-
-
-/* Individual card wrapper */
-.service-marquee-item {
-  flex: 0 0 380px;
-  width: 380px;
-}
-
-
-/* Keep your existing ServiceCard untouched */
-.service-marquee-item .service-card {
-  width: 100%;
-  height: 100%;
-}
-
-
-/* Pause when user hovers */
-.services-marquee:hover .services-marquee-track {
-  animation-play-state: paused;
-}
-
-
-/* Infinite movement */
-@keyframes servicesMarquee {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(
-      calc(-50% - 14px)
+  background:
+    linear-gradient(
+      to left,
+      #ffffff,
+      rgba(255, 255, 255, 0)
     );
-  }
 }
 
 
 /* =========================================================
-   TABLET
+   MOVING TRACK
+   =========================================================
+
+   NO CSS animation here.
+
+   The previous animation:
+
+   animation: servicesMarquee ...
+
+   has intentionally been removed.
+
+   React controls scrollLeft instead.
+   ========================================================= */
+
+.services-marquee-track {
+  display: flex;
+
+  width: max-content;
+
+  gap: 28px;
+
+  /*
+    Prevent cards from shrinking.
+  */
+  flex-wrap: nowrap;
+
+  /*
+    IMPORTANT:
+    Remove old transform animation.
+  */
+  transform: none !important;
+
+  animation: none !important;
+
+  will-change: scroll-position;
+}
+
+
+/* =========================================================
+   INDIVIDUAL SERVICE CARD WRAPPER
+   ========================================================= */
+
+.service-marquee-item {
+  flex:
+    0 0 380px;
+
+  width: 380px;
+}
+
+
+/*
+  Keep existing ServiceCard untouched.
+*/
+
+.service-marquee-item .service-card {
+  width: 100%;
+
+  height: 100%;
+}
+
+
+/* =========================================================
+   TABLET CAROUSEL
    ========================================================= */
 
 @media (max-width: 1024px) {
-
   .service-marquee-item {
     flex-basis: 340px;
+
     width: 340px;
   }
 
   .services-marquee-track {
     gap: 22px;
-    animation-duration: 40s;
   }
-
 }
 
 
 /* =========================================================
-   MOBILE
+   MOBILE CAROUSEL
    ========================================================= */
 
 @media (max-width: 768px) {
-
   .services-marquee {
     padding-bottom: 20px;
   }
 
   .service-marquee-item {
     flex-basis: 300px;
+
     width: 300px;
   }
 
   .services-marquee-track {
     gap: 18px;
-    animation-duration: 35s;
   }
 
   .services-marquee::before,
   .services-marquee::after {
     width: 40px;
   }
-
 }

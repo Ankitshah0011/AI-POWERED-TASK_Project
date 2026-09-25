@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ArrowRight, Sparkles } from "lucide-react";
 
@@ -131,6 +131,12 @@ function Services() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
+  /*
+  ============================================================
+  FILTER SERVICES
+  ============================================================
+  */
+
   const filteredServices = useMemo(() => {
     return services.filter((service) => {
       const matchesCategory =
@@ -149,27 +155,411 @@ function Services() {
     });
   }, [activeCategory, searchTerm]);
 
+
+  /*
+  ============================================================
+  CAROUSEL REFS
+  ============================================================
+  */
+
+  const carouselRef = useRef(null);
+
+  const isDragging = useRef(false);
+
+  const dragStartX = useRef(0);
+
+  const dragStartScrollLeft = useRef(0);
+
+  const autoScrollPaused = useRef(false);
+
+  const resumeTimer = useRef(null);
+
+
+  /*
+  ============================================================
+  FIND WIDTH OF ONE COMPLETE SERVICE SET
+  ============================================================
+  */
+
+  const getLoopWidth = () => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return 0;
+    }
+
+    const track = carousel.querySelector(
+      ".services-marquee-track"
+    );
+
+    if (!track) {
+      return 0;
+    }
+
+    const firstCard = track.children[0];
+
+    const secondSetFirstCard =
+      track.children[filteredServices.length];
+
+    if (!firstCard || !secondSetFirstCard) {
+      return 0;
+    }
+
+    return (
+      secondSetFirstCard.offsetLeft -
+      firstCard.offsetLeft
+    );
+  };
+
+
+  /*
+  ============================================================
+  INFINITE LOOP
+  ============================================================
+  */
+
+  const normalizeCarouselPosition = () => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    const loopWidth = getLoopWidth();
+
+    if (!loopWidth) {
+      return;
+    }
+
+    /*
+      If we move past the first complete set,
+      jump back by exactly one set.
+    */
+
+    while (carousel.scrollLeft >= loopWidth) {
+      carousel.scrollLeft -= loopWidth;
+    }
+
+    /*
+      If the user drags/wheels before the beginning,
+      jump forward by one complete set.
+    */
+
+    while (carousel.scrollLeft < 0) {
+      carousel.scrollLeft += loopWidth;
+    }
+  };
+
+
+  /*
+  ============================================================
+  AUTOMATIC SELF-MOVING
+  ============================================================
+
+  This is intentionally simple.
+
+  Every 20 milliseconds the carousel moves 1 pixel.
+
+  That means:
+
+  1px x 50 times per second
+  = approximately 50px per second.
+
+  The cards continuously move automatically.
+
+  ============================================================
+  */
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+
+    if (!carousel || filteredServices.length === 0) {
+      return;
+    }
+
+    const autoMove = setInterval(() => {
+
+      /*
+        Don't move automatically while
+        the user is interacting.
+      */
+
+      if (
+        autoScrollPaused.current ||
+        isDragging.current
+      ) {
+        return;
+      }
+
+      /*
+        Move cards from RIGHT -> LEFT.
+      */
+
+      carousel.scrollLeft += 1;
+
+      /*
+        Keep looping forever.
+      */
+
+      normalizeCarouselPosition();
+
+    }, 20);
+
+
+    /*
+      Cleanup.
+    */
+
+    return () => {
+      clearInterval(autoMove);
+
+      if (resumeTimer.current) {
+        clearTimeout(resumeTimer.current);
+      }
+    };
+
+  }, [filteredServices.length]);
+
+
+  /*
+  ============================================================
+  PAUSE AUTOMATIC MOVEMENT
+  ============================================================
+  */
+
+  const pauseAutoScroll = () => {
+    autoScrollPaused.current = true;
+
+    if (resumeTimer.current) {
+      clearTimeout(resumeTimer.current);
+    }
+
+    /*
+      Resume automatic movement
+      1.8 seconds after interaction.
+    */
+
+    resumeTimer.current = setTimeout(() => {
+      autoScrollPaused.current = false;
+    }, 1800);
+  };
+
+
+  /*
+  ============================================================
+  MOUSE WHEEL / TRACKPAD
+  ============================================================
+
+  Wheel UP:
+      cards move LEFT
+
+  Wheel DOWN:
+      cards move RIGHT
+
+  ============================================================
+  */
+
+  const handleWheel = (event) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    /*
+      Prevent the page itself from scrolling vertically
+      when the pointer is over the service cards.
+    */
+
+    event.preventDefault();
+
+    let movement = 0;
+
+    /*
+      Normal mouse wheel.
+    */
+
+    if (
+      Math.abs(event.deltaY) >
+      Math.abs(event.deltaX)
+    ) {
+      movement = event.deltaY;
+    }
+
+    /*
+      Trackpad horizontal movement.
+    */
+
+    else {
+      movement = event.deltaX;
+    }
+
+    /*
+      Some mouse wheels report movement in lines.
+    */
+
+    if (event.deltaMode === 1) {
+      movement *= 20;
+    }
+
+    carousel.scrollLeft += movement;
+
+    normalizeCarouselPosition();
+
+    /*
+      Temporarily pause automatic movement.
+    */
+
+    pauseAutoScroll();
+  };
+
+
+  /*
+  ============================================================
+  MOUSE DOWN
+  ============================================================
+  */
+
+  const handleMouseDown = (event) => {
+    const carousel = carouselRef.current;
+
+    if (!carousel) {
+      return;
+    }
+
+    /*
+      Only left mouse button.
+    */
+
+    if (event.button !== 0) {
+      return;
+    }
+
+    isDragging.current = true;
+
+    autoScrollPaused.current = true;
+
+    dragStartX.current =
+      event.pageX - carousel.offsetLeft;
+
+    dragStartScrollLeft.current =
+      carousel.scrollLeft;
+
+    carousel.classList.add("is-dragging");
+
+    /*
+      Prevent text selection.
+    */
+
+    event.preventDefault();
+  };
+
+
+  /*
+  ============================================================
+  MOUSE MOVE
+  ============================================================
+  */
+
+  const handleMouseMove = (event) => {
+    const carousel = carouselRef.current;
+
+    if (
+      !carousel ||
+      !isDragging.current
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const currentX =
+      event.pageX - carousel.offsetLeft;
+
+    const distance =
+      (currentX - dragStartX.current) * 1.15;
+
+    carousel.scrollLeft =
+      dragStartScrollLeft.current - distance;
+
+    normalizeCarouselPosition();
+  };
+
+
+  /*
+  ============================================================
+  STOP DRAGGING
+  ============================================================
+  */
+
+  const stopDragging = () => {
+    if (!isDragging.current) {
+      return;
+    }
+
+    isDragging.current = false;
+
+    const carousel = carouselRef.current;
+
+    if (carousel) {
+      carousel.classList.remove("is-dragging");
+    }
+
+    /*
+      Resume automatic movement after
+      the interaction finishes.
+    */
+
+    pauseAutoScroll();
+  };
+
+
+  /*
+  ============================================================
+  CLEAR FILTERS
+  ============================================================
+  */
+
   const clearFilters = () => {
     setActiveCategory("All Services");
+
     setSearchTerm("");
   };
+
+
+  /*
+  ============================================================
+  PAGE UI
+  ============================================================
+  */
 
   return (
     <main className="services-page">
 
-      {/* HERO */}
+      {/* =====================================================
+          HERO
+      ===================================================== */}
+
       <section className="services-hero">
+
         <div className="hero-content">
 
           <div className="hero-badge">
+
             <Sparkles size={16} />
-            <span>HOME SERVICES</span>
+
+            <span>
+              HOME SERVICES
+            </span>
+
           </div>
+
 
           <h1>
             Explore Our{" "}
             <span>Services</span>
           </h1>
+
 
           <p>
             Find trusted professionals for reliable home
@@ -177,10 +567,14 @@ function Services() {
           </p>
 
         </div>
+
       </section>
 
 
-      {/* SERVICES SECTION */}
+      {/* =====================================================
+          SERVICES SECTION
+      ===================================================== */}
+
       <section className="services-section">
 
         <div className="services-toolbar">
@@ -197,6 +591,7 @@ function Services() {
 
           </div>
 
+
           <ServiceSearch
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -205,7 +600,10 @@ function Services() {
         </div>
 
 
-        {/* CATEGORY FILTER */}
+        {/* ===================================================
+            CATEGORY FILTERS
+        =================================================== */}
+
         <div className="category-filters">
 
           {categories.map((category) => (
@@ -220,76 +618,127 @@ function Services() {
         </div>
 
 
-        {/* RESULT COUNT */}
+        {/* ===================================================
+            RESULT COUNT
+        =================================================== */}
+
         <div className="services-result-row">
 
           <p>
             Showing{" "}
+
             <strong>
               {filteredServices.length}
             </strong>{" "}
+
             services
           </p>
 
+
           {(searchTerm ||
             activeCategory !== "All Services") && (
+
             <button
               className="clear-filters"
               onClick={clearFilters}
             >
               Clear filters
             </button>
+
           )}
 
         </div>
 
 
-        {/* SERVICE GRID */}
-       {filteredServices.length > 0 ? (
-  <div className="services-marquee">
+        {/* ===================================================
+            SERVICE CAROUSEL
+        =================================================== */}
 
-    <div className="services-marquee-track">
+        {filteredServices.length > 0 ? (
 
-      {/* FIRST SET */}
-      {filteredServices.map((service) => (
-        <div
-          className="service-marquee-item"
-          key={`first-${service.id}`}
-        >
-          <ServiceCard service={service} />
-        </div>
-      ))}
+          <div
+            className="services-marquee"
+            ref={carouselRef}
 
-      {/* DUPLICATE SET FOR SEAMLESS LOOP */}
-      {filteredServices.map((service) => (
-        <div
-          className="service-marquee-item"
-          key={`second-${service.id}`}
-          aria-hidden="true"
-        >
-          <ServiceCard service={service} />
-        </div>
-      ))}
+            onWheel={handleWheel}
 
-    </div>
+            onMouseDown={handleMouseDown}
 
-  </div>
-) : (
+            onMouseMove={handleMouseMove}
+
+            onMouseUp={stopDragging}
+
+            onMouseLeave={stopDragging}
+          >
+
+            <div className="services-marquee-track">
+
+
+              {/* FIRST SET */}
+
+              {filteredServices.map((service) => (
+
+                <div
+                  className="service-marquee-item"
+                  key={`first-${service.id}`}
+                >
+
+                  <ServiceCard
+                    service={service}
+                  />
+
+                </div>
+
+              ))}
+
+
+              {/* DUPLICATE SET */}
+
+              {filteredServices.map((service) => (
+
+                <div
+                  className="service-marquee-item"
+                  key={`second-${service.id}`}
+                  aria-hidden="true"
+                >
+
+                  <ServiceCard
+                    service={service}
+                  />
+
+                </div>
+
+              ))}
+
+            </div>
+
+          </div>
+
+        ) : (
+
+          /* =================================================
+             EMPTY STATE
+          ================================================= */
 
           <div className="empty-services">
 
             <div className="empty-icon">
+
               <Sparkles size={30} />
+
             </div>
+
 
             <h3>
               No services found
             </h3>
 
+
             <p>
               Try adjusting your search or selecting a
               different category.
             </p>
+
 
             <button
               className="primary-btn"
@@ -305,11 +754,17 @@ function Services() {
       </section>
 
 
-      {/* HOW IT WORKS */}
+      {/* =====================================================
+          HOW IT WORKS
+      ===================================================== */}
+
       <HowItWorks />
 
 
-      {/* CTA */}
+      {/* =====================================================
+          CTA
+      ===================================================== */}
+
       <section className="services-cta">
 
         <div className="cta-content">
@@ -318,14 +773,17 @@ function Services() {
             READY TO GET STARTED?
           </span>
 
+
           <h2>
             Have a task in mind?
           </h2>
+
 
           <p>
             Find the right home service and get your
             task moving today.
           </p>
+
 
           <button className="cta-button">
 
