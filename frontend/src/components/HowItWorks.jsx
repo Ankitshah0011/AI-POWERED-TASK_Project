@@ -1,25 +1,30 @@
-import { Search, MessageSquare, CheckCircle } from "lucide-react";
+import {
+  Search,
+  FileText,
+  CheckCircle2,
+} from "lucide-react";
 
-// Steps live in an array so we can render them with .map() instead of
-// writing the same block of JSX three times.
 const steps = [
   {
-    id: 1,
+    number: "01",
+    title: "Choose a Service",
+    description:
+      "Explore our services and find the right solution for your task.",
     icon: Search,
-    title: "Find a Service",
-    description: "Browse services and find the right professional for your task.",
   },
   {
-    id: 2,
-    icon: MessageSquare,
-    title: "Connect & Discuss",
-    description: "Connect with the service provider and discuss your requirements.",
+    number: "02",
+    title: "Describe Your Task",
+    description:
+      "Tell the service provider what you need and share your requirements.",
+    icon: FileText,
   },
   {
-    id: 3,
-    icon: CheckCircle,
+    number: "03",
     title: "Get It Done",
-    description: "Track progress and receive your completed work.",
+    description:
+      "Collaborate with the right expert and get your task completed.",
+    icon: CheckCircle2,
   },
 ];
 
@@ -27,27 +32,33 @@ function HowItWorks() {
   return (
     <section className="how-it-works">
       <div className="section-heading">
+        <span className="section-label">SIMPLE PROCESS</span>
+
         <h2>How It Works</h2>
-        <p>Three simple steps to get your task done.</p>
+
+        <p>
+          Getting the right service for your task is simple.
+        </p>
       </div>
 
-      <div className="how-it-works__steps">
-        {steps.map((step, index) => (
-          <div className="how-it-works__step" key={step.id}>
-            <div className="how-it-works__marker">
-              <span className="how-it-works__number">{step.id}</span>
-              <div className="how-it-works__icon">
-                <step.icon size={20} strokeWidth={2} />
+      <div className="steps-grid">
+        {steps.map((step) => {
+          const Icon = step.icon;
+
+          return (
+            <div className="step-card" key={step.number}>
+              <div className="step-number">{step.number}</div>
+
+              <div className="step-icon">
+                <Icon size={25} />
               </div>
+
+              <h3>{step.title}</h3>
+
+              <p>{step.description}</p>
             </div>
-            {/* Connecting line between steps, hidden after the last step */}
-            {index < steps.length - 1 && (
-              <span className="how-it-works__line" aria-hidden="true" />
-            )}
-            <h3 className="how-it-works__title">{step.title}</h3>
-            <p className="how-it-works__description">{step.description}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

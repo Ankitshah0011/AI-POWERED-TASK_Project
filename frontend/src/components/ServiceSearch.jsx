@@ -1,40 +1,26 @@
 import { Search, X } from "lucide-react";
 
-/**
- * ServiceSearch
- * -------------
- * A controlled search input.
- *
- * "Controlled" means this component does not keep its own state —
- * the actual text lives in the PARENT (Services.jsx) as `searchTerm`.
- * This component just displays that value and reports changes back
- * up through `setSearchTerm`. That's why we pass both down as props.
- */
 function ServiceSearch({ searchTerm, setSearchTerm }) {
   return (
-    <div className="service-search">
-      <Search size={19} className="service-search__icon" />
+    <div className="service-search-wrapper">
+      <Search className="search-icon" size={21} />
+
       <input
         type="text"
-        className="service-search__input"
-        placeholder="Search for services, skills, or tasks..."
+        placeholder="Search services..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        aria-label="Search services"
       />
+
       {searchTerm && (
         <button
-          type="button"
-          className="service-search__clear"
+          className="clear-search"
           onClick={() => setSearchTerm("")}
           aria-label="Clear search"
         >
-          <X size={16} />
+          <X size={18} />
         </button>
       )}
-      <button type="button" className="btn btn--primary service-search__btn">
-        Search
-      </button>
     </div>
   );
 }
