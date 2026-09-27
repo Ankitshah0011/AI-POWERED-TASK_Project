@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-
 import { ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 
 import ServiceCard from "../components/ServiceCard";
@@ -155,7 +154,6 @@ function normalizeService(service, index) {
 
   return {
     ...service,
-
     id,
     title,
     category,
@@ -176,14 +174,10 @@ function Services() {
   */
 
   const [services, setServices] = useState([]);
-
   const [activeCategory, setActiveCategory] =
     useState("All Services");
-
   const [searchTerm, setSearchTerm] = useState("");
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
   /*
@@ -200,9 +194,7 @@ function Services() {
       const response = await fetch(TASKS_ENDPOINT);
 
       if (!response.ok) {
-        throw new Error(
-          `Server returned ${response.status}`
-        );
+        throw new Error(`Server returned ${response.status}`);
       }
 
       const data = await response.json();
@@ -223,10 +215,7 @@ function Services() {
 
       setActiveCategory("All Services");
     } catch (err) {
-      console.error(
-        "Failed to fetch services:",
-        err
-      );
+      console.error("Failed to fetch services:", err);
 
       setError(
         "Unable to load services. Please make sure the FastAPI backend is running."
@@ -254,15 +243,6 @@ function Services() {
   |--------------------------------------------------------------------------
   |
   | Categories are NOT hardcoded anymore.
-  |
-  | If MongoDB contains:
-  |
-  | Plumbing
-  | Electrical
-  | Cleaning
-  | AC
-  |
-  | React automatically creates those category buttons.
   |
   */
 
@@ -342,15 +322,10 @@ function Services() {
   */
 
   const carouselRef = useRef(null);
-
   const isDragging = useRef(false);
-
   const dragStartX = useRef(0);
-
   const dragStartScrollLeft = useRef(0);
-
   const autoScrollPaused = useRef(false);
-
   const resumeTimer = useRef(null);
 
   /*
@@ -360,10 +335,15 @@ function Services() {
   */
 
   const getLoopWidth = () => {
-    const carousel =
-      carouselRef.current;
+    const carousel = carouselRef.current;
 
     if (!carousel) {
+      return 0;
+    }
+
+    // Infinite looping is only needed when there are
+    // at least 2 services.
+    if (filteredServices.length <= 1) {
       return 0;
     }
 
@@ -403,37 +383,36 @@ function Services() {
   |--------------------------------------------------------------------------
   */
 
-  const normalizeCarouselPosition =
-    () => {
-      const carousel =
-        carouselRef.current;
+  const normalizeCarouselPosition = () => {
+    const carousel =
+      carouselRef.current;
 
-      if (!carousel) {
-        return;
-      }
+    if (!carousel) {
+      return;
+    }
 
-      const loopWidth =
-        getLoopWidth();
+    const loopWidth =
+      getLoopWidth();
 
-      if (!loopWidth) {
-        return;
-      }
+    if (!loopWidth) {
+      return;
+    }
 
-      while (
-        carousel.scrollLeft >=
-        loopWidth
-      ) {
-        carousel.scrollLeft -=
-          loopWidth;
-      }
+    while (
+      carousel.scrollLeft >=
+      loopWidth
+    ) {
+      carousel.scrollLeft -=
+        loopWidth;
+    }
 
-      while (
-        carousel.scrollLeft < 0
-      ) {
-        carousel.scrollLeft +=
-          loopWidth;
-      }
-    };
+    while (
+      carousel.scrollLeft < 0
+    ) {
+      carousel.scrollLeft +=
+        loopWidth;
+    }
+  };
 
   /*
   |--------------------------------------------------------------------------
@@ -445,9 +424,11 @@ function Services() {
     const carousel =
       carouselRef.current;
 
+    // Do not auto-scroll when there
+    // is only one service.
     if (
       !carousel ||
-      filteredServices.length === 0
+      filteredServices.length <= 1
     ) {
       return;
     }
@@ -527,7 +508,9 @@ function Services() {
     }
 
     /*
+    |--------------------------------------------------------------------------
     | Trackpad/mouse wheel normalization
+    |--------------------------------------------------------------------------
     */
 
     if (event.deltaMode === 1) {
@@ -722,7 +705,7 @@ function Services() {
 
       {/* ================================================================
           HERO
-      ================================================================ */}
+      ================================================================= */}
 
       <section className="services-hero">
         <div className="hero-content">
@@ -752,7 +735,7 @@ function Services() {
 
       {/* ================================================================
           SERVICES
-      ================================================================ */}
+      ================================================================= */}
 
       <section className="services-section">
 
@@ -763,7 +746,6 @@ function Services() {
         <div className="services-toolbar">
 
           <div>
-
             <span className="section-label">
               FIND THE RIGHT SERVICE
             </span>
@@ -771,7 +753,6 @@ function Services() {
             <h2>
               What can we help you with?
             </h2>
-
           </div>
 
           <ServiceSearch
@@ -825,6 +806,7 @@ function Services() {
           {(searchTerm ||
             activeCategory !==
               "All Services") && (
+
             <button
               className="clear-filters"
               onClick={
@@ -833,6 +815,7 @@ function Services() {
             >
               Clear filters
             </button>
+
           )}
 
         </div>
@@ -900,7 +883,9 @@ function Services() {
 
             <div className="services-marquee-track">
 
-              {/* FIRST SET */}
+              {/* ======================================================
+                  FIRST SET
+              ====================================================== */}
 
               {filteredServices.map(
                 (service) => (
@@ -915,22 +900,34 @@ function Services() {
                 )
               )}
 
-              {/* SECOND SET
-                  Used for infinite scrolling */}
+              {/* ======================================================
+                  SECOND SET
 
-              {filteredServices.map(
-                (service) => (
-                  <div
-                    className="service-marquee-item"
-                    key={`second-${service.id}`}
-                    aria-hidden="true"
-                  >
-                    <ServiceCard
-                      service={service}
-                    />
-                  </div>
-                )
-              )}
+                  Only create the duplicate set when there
+                  is more than one service.
+
+                  This prevents:
+
+                  Showing 1 services
+
+                  [AC Repair] [AC Repair]
+
+                  ====================================================== */}
+
+              {filteredServices.length > 1 &&
+                filteredServices.map(
+                  (service) => (
+                    <div
+                      className="service-marquee-item"
+                      key={`second-${service.id}`}
+                      aria-hidden="true"
+                    >
+                      <ServiceCard
+                        service={service}
+                      />
+                    </div>
+                  )
+                )}
 
             </div>
 
@@ -979,13 +976,13 @@ function Services() {
 
       {/* ================================================================
           HOW IT WORKS
-      ================================================================ */}
+      ================================================================= */}
 
       <HowItWorks />
 
       {/* ================================================================
           CTA
-      ================================================================ */}
+      ================================================================= */}
 
       <section className="services-cta">
 
