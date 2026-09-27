@@ -27,13 +27,26 @@ function ServiceCard({ service }) {
 
   return (
     <article className="service-card">
-      {/* Visual */}
-      <div className={`service-card-visual ${service.visualClass}`}>
-        <div className="visual-pattern"></div>
 
-        <div className="service-visual-icon">
-          <Icon size={42} strokeWidth={1.7} />
-        </div>
+      {/* Visual */}
+      <div
+        className={`service-card-visual ${service.visualClass || ""}`}
+      >
+        {service.image ? (
+          <img
+            src={service.image}
+            alt={service.title}
+            className="service-card-image"
+          />
+        ) : (
+          <>
+            <div className="visual-pattern"></div>
+
+            <div className="service-visual-icon">
+              <Icon size={42} strokeWidth={1.7} />
+            </div>
+          </>
+        )}
 
         <span className="service-category-badge">
           {service.category}
@@ -42,6 +55,7 @@ function ServiceCard({ service }) {
 
       {/* Content */}
       <div className="service-card-content">
+
         <h3>{service.title}</h3>
 
         <p className="service-description">
@@ -50,15 +64,21 @@ function ServiceCard({ service }) {
 
         <div className="service-rating">
           <Star size={16} fill="currentColor" />
+
           <span>{service.rating}</span>
+
           <span className="review-count">
             ({service.reviews} reviews)
           </span>
         </div>
 
         <div className="service-card-bottom">
+
           <div>
-            <span className="starting-label">Starting from</span>
+            <span className="starting-label">
+              Starting from
+            </span>
+
             <strong>${service.price}</strong>
           </div>
 
@@ -66,8 +86,10 @@ function ServiceCard({ service }) {
             View Service
             <ArrowRight size={16} />
           </button>
+
         </div>
       </div>
+
     </article>
   );
 }

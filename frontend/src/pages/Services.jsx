@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 
 import ServiceCard from "../components/ServiceCard";
 import ServiceCategoryCard from "../components/ServiceCategoryCard";
@@ -9,157 +9,336 @@ import HowItWorks from "../components/HowItWorks";
 
 import "./Services.css";
 
-const categories = [
-  "All Services",
-  "AC & Appliances",
-  "Plumbing",
-  "Electrical",
-  "Cleaning",
-  "Carpentry",
-  "Painting",
-];
+/*
+|--------------------------------------------------------------------------
+| API CONFIGURATION
+|--------------------------------------------------------------------------
+|
+| Create a frontend .env file:
+|
+| VITE_API_URL=http://127.0.0.1:8000
+|
+| Then restart Vite.
+|
+*/
 
-const services = [
-  {
-    id: 1,
-    title: "AC Repair & Service",
-    category: "AC & Appliances",
-    icon: "content",
-    description:
-      "Professional AC repair, servicing and maintenance at your doorstep.",
-    rating: "4.9",
-    reviews: 128,
-    price: 299,
-    visualClass: "visual-content",
-  },
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-  {
-    id: 2,
-    title: "Plumbing & Pipe Repair",
-    category: "Plumbing",
-    icon: "image",
-    description:
-      "Fix leaking pipes, taps, sinks and other plumbing problems quickly.",
-    rating: "4.8",
-    reviews: 96,
-    price: 199,
-    visualClass: "visual-image",
-  },
+const TASKS_ENDPOINT = `${API_BASE_URL}/api/tasks`;
 
-  {
-    id: 3,
-    title: "Electrical Repair",
-    category: "Electrical",
-    icon: "development",
-    description:
-      "Reliable electrical repair for switches, wiring, fans, lights and more.",
-    rating: "5.0",
-    reviews: 84,
-    price: 249,
-    visualClass: "visual-development",
-  },
+/*
+|--------------------------------------------------------------------------
+| NORMALIZE BACKEND RESPONSE
+|--------------------------------------------------------------------------
+|
+| Different backend implementations may return:
+|
+| [
+|   {...},
+|   {...}
+| ]
+|
+| OR:
+|
+| {
+|   "data": [...]
+| }
+|
+| OR:
+|
+| {
+|   "tasks": [...]
+| }
+|
+| This function handles those common formats.
+|
+*/
 
-  {
-    id: 4,
-    title: "Refrigerator Repair",
-    category: "AC & Appliances",
-    icon: "ai",
-    description:
-      "Professional refrigerator repair and maintenance by experienced technicians.",
-    rating: "4.9",
-    reviews: 73,
-    price: 349,
-    visualClass: "visual-ai",
-  },
+function extractServices(response) {
+  if (Array.isArray(response)) {
+    return response;
+  }
 
-  {
-    id: 5,
-    title: "Washing Machine Repair",
-    category: "AC & Appliances",
-    icon: "data",
-    description:
-      "Reliable washing machine repair and servicing for all major brands.",
-    rating: "4.8",
-    reviews: 61,
-    price: 299,
-    visualClass: "visual-data",
-  },
+  if (Array.isArray(response?.data)) {
+    return response.data;
+  }
 
-  {
-    id: 6,
-    title: "Home Cleaning",
-    category: "Cleaning",
-    icon: "design",
-    description:
-      "Professional cleaning services for bedrooms, kitchens, bathrooms and complete homes.",
-    rating: "4.9",
-    reviews: 102,
-    price: 499,
-    visualClass: "visual-design",
-  },
+  if (Array.isArray(response?.tasks)) {
+    return response.tasks;
+  }
 
-  {
-    id: 7,
-    title: "Carpentry & Furniture",
-    category: "Carpentry",
-    icon: "ml",
-    description:
-      "Furniture repair, installation, assembly and other carpentry services.",
-    rating: "4.8",
-    reviews: 58,
-    price: 399,
-    visualClass: "visual-ml",
-  },
+  if (Array.isArray(response?.items)) {
+    return response.items;
+  }
 
-  {
-    id: 8,
-    title: "Home Painting",
-    category: "Painting",
-    icon: "marketing",
-    description:
-      "Professional interior and exterior painting services for your home.",
-    rating: "4.9",
-    reviews: 67,
-    price: 999,
-    visualClass: "visual-marketing",
-  },
-];
+  if (Array.isArray(response?.results)) {
+    return response.results;
+  }
+
+  return [];
+}
+
+/*
+|--------------------------------------------------------------------------
+| NORMALIZE ONE SERVICE
+|--------------------------------------------------------------------------
+|
+| Converts backend data into the shape expected by ServiceCard.
+|
+*/
+
+function normalizeService(service, index) {
+  const id =
+    service.id ??
+    service._id ??
+    service.task_id ??
+    service.taskId ??
+    index + 1;
+
+  const title =
+    service.title ??
+    service.name ??
+    service.service_name ??
+    service.serviceName ??
+    service.task_title ??
+    service.taskTitle ??
+    "Home Service";
+
+  const category =
+    service.category ??
+    service.category_name ??
+    service.categoryName ??
+    service.service_category ??
+    "Other";
+
+  const description =
+    service.description ??
+    service.details ??
+    service.task_description ??
+    service.taskDescription ??
+    "Professional service provided by a trusted professional.";
+
+  const location =
+    service.location ??
+    service.city ??
+    service.address ??
+    service.service_location ??
+    "Available at your location";
+
+  const price =
+    service.price ??
+    service.budget ??
+    service.starting_price ??
+    service.startingPrice ??
+    0;
+
+  const rating =
+    service.rating ??
+    service.average_rating ??
+    service.averageRating ??
+    0;
+
+  const reviews =
+    service.reviews ??
+    service.review_count ??
+    service.reviewCount ??
+    0;
+
+  const image =
+    service.image ??
+    service.image_url ??
+    service.imageUrl ??
+    service.thumbnail ??
+    service.photo ??
+    "";
+
+  return {
+    ...service,
+
+    id,
+    title,
+    category,
+    description,
+    location,
+    price,
+    rating,
+    reviews,
+    image,
+  };
+}
 
 function Services() {
+  /*
+  |--------------------------------------------------------------------------
+  | STATE
+  |--------------------------------------------------------------------------
+  */
+
+  const [services, setServices] = useState([]);
+
   const [activeCategory, setActiveCategory] =
     useState("All Services");
 
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
   /*
-  ============================================================
-  FILTER SERVICES
-  ============================================================
+  |--------------------------------------------------------------------------
+  | FETCH SERVICES FROM FASTAPI
+  |--------------------------------------------------------------------------
+  */
+
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch(TASKS_ENDPOINT);
+
+      if (!response.ok) {
+        throw new Error(
+          `Server returned ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      const serviceList = extractServices(data);
+
+      const normalizedServices = serviceList.map(
+        normalizeService
+      );
+
+      setServices(normalizedServices);
+
+      /*
+      |--------------------------------------------------------------------------
+      | RESET CATEGORY WHEN NEW DATA ARRIVES
+      |--------------------------------------------------------------------------
+      */
+
+      setActiveCategory("All Services");
+    } catch (err) {
+      console.error(
+        "Failed to fetch services:",
+        err
+      );
+
+      setError(
+        "Unable to load services. Please make sure the FastAPI backend is running."
+      );
+
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | LOAD SERVICES ON PAGE LOAD
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  /*
+  |--------------------------------------------------------------------------
+  | CREATE CATEGORIES DYNAMICALLY
+  |--------------------------------------------------------------------------
+  |
+  | Categories are NOT hardcoded anymore.
+  |
+  | If MongoDB contains:
+  |
+  | Plumbing
+  | Electrical
+  | Cleaning
+  | AC
+  |
+  | React automatically creates those category buttons.
+  |
+  */
+
+  const categories = useMemo(() => {
+    const uniqueCategories = [
+      ...new Set(
+        services
+          .map((service) => service.category)
+          .filter(Boolean)
+      ),
+    ];
+
+    return [
+      "All Services",
+      ...uniqueCategories,
+    ];
+  }, [services]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | FILTER SERVICES
+  |--------------------------------------------------------------------------
   */
 
   const filteredServices = useMemo(() => {
+    const search = searchTerm
+      .toLowerCase()
+      .trim();
+
     return services.filter((service) => {
+      /*
+      |--------------------------------------------------------------------------
+      | CATEGORY FILTER
+      |--------------------------------------------------------------------------
+      */
+
       const matchesCategory =
         activeCategory === "All Services" ||
         service.category === activeCategory;
 
-      const search = searchTerm.toLowerCase().trim();
+      /*
+      |--------------------------------------------------------------------------
+      | SEARCH FILTER
+      |--------------------------------------------------------------------------
+      */
 
       const matchesSearch =
         !search ||
-        service.title.toLowerCase().includes(search) ||
-        service.description.toLowerCase().includes(search) ||
-        service.category.toLowerCase().includes(search);
+        String(service.title)
+          .toLowerCase()
+          .includes(search) ||
+        String(service.description)
+          .toLowerCase()
+          .includes(search) ||
+        String(service.category)
+          .toLowerCase()
+          .includes(search) ||
+        String(service.location)
+          .toLowerCase()
+          .includes(search);
 
-      return matchesCategory && matchesSearch;
+      return (
+        matchesCategory &&
+        matchesSearch
+      );
     });
-  }, [activeCategory, searchTerm]);
-
+  }, [
+    services,
+    activeCategory,
+    searchTerm,
+  ]);
 
   /*
-  ============================================================
-  CAROUSEL REFS
-  ============================================================
+  |--------------------------------------------------------------------------
+  | CAROUSEL REFERENCES
+  |--------------------------------------------------------------------------
   */
 
   const carouselRef = useRef(null);
@@ -174,34 +353,41 @@ function Services() {
 
   const resumeTimer = useRef(null);
 
-
   /*
-  ============================================================
-  FIND WIDTH OF ONE COMPLETE SERVICE SET
-  ============================================================
+  |--------------------------------------------------------------------------
+  | FIND ONE COMPLETE SET WIDTH
+  |--------------------------------------------------------------------------
   */
 
   const getLoopWidth = () => {
-    const carousel = carouselRef.current;
+    const carousel =
+      carouselRef.current;
 
     if (!carousel) {
       return 0;
     }
 
-    const track = carousel.querySelector(
-      ".services-marquee-track"
-    );
+    const track =
+      carousel.querySelector(
+        ".services-marquee-track"
+      );
 
     if (!track) {
       return 0;
     }
 
-    const firstCard = track.children[0];
+    const firstCard =
+      track.children[0];
 
     const secondSetFirstCard =
-      track.children[filteredServices.length];
+      track.children[
+        filteredServices.length
+      ];
 
-    if (!firstCard || !secondSetFirstCard) {
+    if (
+      !firstCard ||
+      !secondSetFirstCard
+    ) {
       return 0;
     }
 
@@ -211,191 +397,137 @@ function Services() {
     );
   };
 
-
   /*
-  ============================================================
-  INFINITE LOOP
-  ============================================================
+  |--------------------------------------------------------------------------
+  | INFINITE CAROUSEL
+  |--------------------------------------------------------------------------
   */
 
-  const normalizeCarouselPosition = () => {
-    const carousel = carouselRef.current;
+  const normalizeCarouselPosition =
+    () => {
+      const carousel =
+        carouselRef.current;
 
-    if (!carousel) {
-      return;
-    }
-
-    const loopWidth = getLoopWidth();
-
-    if (!loopWidth) {
-      return;
-    }
-
-    /*
-      If we move past the first complete set,
-      jump back by exactly one set.
-    */
-
-    while (carousel.scrollLeft >= loopWidth) {
-      carousel.scrollLeft -= loopWidth;
-    }
-
-    /*
-      If the user drags/wheels before the beginning,
-      jump forward by one complete set.
-    */
-
-    while (carousel.scrollLeft < 0) {
-      carousel.scrollLeft += loopWidth;
-    }
-  };
-
-
-  /*
-  ============================================================
-  AUTOMATIC SELF-MOVING
-  ============================================================
-
-  This is intentionally simple.
-
-  Every 20 milliseconds the carousel moves 1 pixel.
-
-  That means:
-
-  1px x 50 times per second
-  = approximately 50px per second.
-
-  The cards continuously move automatically.
-
-  ============================================================
-  */
-
-  useEffect(() => {
-    const carousel = carouselRef.current;
-
-    if (!carousel || filteredServices.length === 0) {
-      return;
-    }
-
-    const autoMove = setInterval(() => {
-
-      /*
-        Don't move automatically while
-        the user is interacting.
-      */
-
-      if (
-        autoScrollPaused.current ||
-        isDragging.current
-      ) {
+      if (!carousel) {
         return;
       }
 
-      /*
-        Move cards from RIGHT -> LEFT.
-      */
+      const loopWidth =
+        getLoopWidth();
 
-      carousel.scrollLeft += 1;
+      if (!loopWidth) {
+        return;
+      }
 
-      /*
-        Keep looping forever.
-      */
+      while (
+        carousel.scrollLeft >=
+        loopWidth
+      ) {
+        carousel.scrollLeft -=
+          loopWidth;
+      }
 
-      normalizeCarouselPosition();
+      while (
+        carousel.scrollLeft < 0
+      ) {
+        carousel.scrollLeft +=
+          loopWidth;
+      }
+    };
 
-    }, 20);
+  /*
+  |--------------------------------------------------------------------------
+  | AUTOMATIC MOVEMENT
+  |--------------------------------------------------------------------------
+  */
 
+  useEffect(() => {
+    const carousel =
+      carouselRef.current;
 
-    /*
-      Cleanup.
-    */
+    if (
+      !carousel ||
+      filteredServices.length === 0
+    ) {
+      return;
+    }
+
+    const autoMove =
+      setInterval(() => {
+        if (
+          autoScrollPaused.current ||
+          isDragging.current
+        ) {
+          return;
+        }
+
+        carousel.scrollLeft += 1;
+
+        normalizeCarouselPosition();
+      }, 20);
 
     return () => {
       clearInterval(autoMove);
 
       if (resumeTimer.current) {
-        clearTimeout(resumeTimer.current);
+        clearTimeout(
+          resumeTimer.current
+        );
       }
     };
-
   }, [filteredServices.length]);
 
-
   /*
-  ============================================================
-  PAUSE AUTOMATIC MOVEMENT
-  ============================================================
+  |--------------------------------------------------------------------------
+  | PAUSE AUTO SCROLL
+  |--------------------------------------------------------------------------
   */
 
   const pauseAutoScroll = () => {
     autoScrollPaused.current = true;
 
     if (resumeTimer.current) {
-      clearTimeout(resumeTimer.current);
+      clearTimeout(
+        resumeTimer.current
+      );
     }
 
-    /*
-      Resume automatic movement
-      1.8 seconds after interaction.
-    */
-
-    resumeTimer.current = setTimeout(() => {
-      autoScrollPaused.current = false;
-    }, 1800);
+    resumeTimer.current =
+      setTimeout(() => {
+        autoScrollPaused.current =
+          false;
+      }, 1800);
   };
 
-
   /*
-  ============================================================
-  MOUSE WHEEL / TRACKPAD
-  ============================================================
-
-  Wheel UP:
-      cards move LEFT
-
-  Wheel DOWN:
-      cards move RIGHT
-
-  ============================================================
+  |--------------------------------------------------------------------------
+  | MOUSE WHEEL / TRACKPAD
+  |--------------------------------------------------------------------------
   */
 
   const handleWheel = (event) => {
-    const carousel = carouselRef.current;
+    const carousel =
+      carouselRef.current;
 
     if (!carousel) {
       return;
     }
 
-    /*
-      Prevent the page itself from scrolling vertically
-      when the pointer is over the service cards.
-    */
-
     event.preventDefault();
 
     let movement = 0;
-
-    /*
-      Normal mouse wheel.
-    */
 
     if (
       Math.abs(event.deltaY) >
       Math.abs(event.deltaX)
     ) {
       movement = event.deltaY;
-    }
-
-    /*
-      Trackpad horizontal movement.
-    */
-
-    else {
+    } else {
       movement = event.deltaX;
     }
 
     /*
-      Some mouse wheels report movement in lines.
+    | Trackpad/mouse wheel normalization
     */
 
     if (event.deltaMode === 1) {
@@ -406,30 +538,24 @@ function Services() {
 
     normalizeCarouselPosition();
 
-    /*
-      Temporarily pause automatic movement.
-    */
-
     pauseAutoScroll();
   };
 
-
   /*
-  ============================================================
-  MOUSE DOWN
-  ============================================================
+  |--------------------------------------------------------------------------
+  | MOUSE DRAG START
+  |--------------------------------------------------------------------------
   */
 
-  const handleMouseDown = (event) => {
-    const carousel = carouselRef.current;
+  const handleMouseDown = (
+    event
+  ) => {
+    const carousel =
+      carouselRef.current;
 
     if (!carousel) {
       return;
     }
-
-    /*
-      Only left mouse button.
-    */
 
     if (event.button !== 0) {
       return;
@@ -440,29 +566,30 @@ function Services() {
     autoScrollPaused.current = true;
 
     dragStartX.current =
-      event.pageX - carousel.offsetLeft;
+      event.pageX -
+      carousel.offsetLeft;
 
     dragStartScrollLeft.current =
       carousel.scrollLeft;
 
-    carousel.classList.add("is-dragging");
-
-    /*
-      Prevent text selection.
-    */
+    carousel.classList.add(
+      "is-dragging"
+    );
 
     event.preventDefault();
   };
 
-
   /*
-  ============================================================
-  MOUSE MOVE
-  ============================================================
+  |--------------------------------------------------------------------------
+  | MOUSE DRAG MOVE
+  |--------------------------------------------------------------------------
   */
 
-  const handleMouseMove = (event) => {
-    const carousel = carouselRef.current;
+  const handleMouseMove = (
+    event
+  ) => {
+    const carousel =
+      carouselRef.current;
 
     if (
       !carousel ||
@@ -474,22 +601,25 @@ function Services() {
     event.preventDefault();
 
     const currentX =
-      event.pageX - carousel.offsetLeft;
+      event.pageX -
+      carousel.offsetLeft;
 
     const distance =
-      (currentX - dragStartX.current) * 1.15;
+      (currentX -
+        dragStartX.current) *
+      1.15;
 
     carousel.scrollLeft =
-      dragStartScrollLeft.current - distance;
+      dragStartScrollLeft.current -
+      distance;
 
     normalizeCarouselPosition();
   };
 
-
   /*
-  ============================================================
-  STOP DRAGGING
-  ============================================================
+  |--------------------------------------------------------------------------
+  | STOP DRAGGING
+  |--------------------------------------------------------------------------
   */
 
   const stopDragging = () => {
@@ -499,83 +629,136 @@ function Services() {
 
     isDragging.current = false;
 
-    const carousel = carouselRef.current;
+    const carousel =
+      carouselRef.current;
 
     if (carousel) {
-      carousel.classList.remove("is-dragging");
+      carousel.classList.remove(
+        "is-dragging"
+      );
     }
-
-    /*
-      Resume automatic movement after
-      the interaction finishes.
-    */
 
     pauseAutoScroll();
   };
 
-
   /*
-  ============================================================
-  CLEAR FILTERS
-  ============================================================
+  |--------------------------------------------------------------------------
+  | CLEAR FILTERS
+  |--------------------------------------------------------------------------
   */
 
   const clearFilters = () => {
-    setActiveCategory("All Services");
+    setActiveCategory(
+      "All Services"
+    );
 
     setSearchTerm("");
   };
 
+  /*
+  |--------------------------------------------------------------------------
+  | LOADING STATE
+  |--------------------------------------------------------------------------
+  */
+
+  if (loading) {
+    return (
+      <main className="services-page">
+        <section className="services-hero">
+          <div className="hero-content">
+            <div className="hero-badge">
+              <Sparkles size={16} />
+
+              <span>
+                HOME SERVICES
+              </span>
+            </div>
+
+            <h1>
+              Explore Our{" "}
+              <span>Services</span>
+            </h1>
+
+            <p>
+              Find trusted professionals
+              for reliable home services,
+              repairs and maintenance at
+              your doorstep.
+            </p>
+          </div>
+        </section>
+
+        <section className="services-section">
+          <div className="empty-services">
+            <div className="empty-icon">
+              <RefreshCw
+                size={30}
+                className="animate-spin"
+              />
+            </div>
+
+            <h3>
+              Loading services...
+            </h3>
+
+            <p>
+              Getting the latest services
+              from our server.
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   /*
-  ============================================================
-  PAGE UI
-  ============================================================
+  |--------------------------------------------------------------------------
+  | MAIN UI
+  |--------------------------------------------------------------------------
   */
 
   return (
     <main className="services-page">
 
-      {/* =====================================================
+      {/* ================================================================
           HERO
-      ===================================================== */}
+      ================================================================ */}
 
       <section className="services-hero">
-
         <div className="hero-content">
 
           <div className="hero-badge">
-
             <Sparkles size={16} />
 
             <span>
               HOME SERVICES
             </span>
-
           </div>
-
 
           <h1>
             Explore Our{" "}
             <span>Services</span>
           </h1>
 
-
           <p>
-            Find trusted professionals for reliable home
-            services, repairs and maintenance at your doorstep.
+            Find trusted professionals
+            for reliable home services,
+            repairs and maintenance at
+            your doorstep.
           </p>
 
         </div>
-
       </section>
 
-
-      {/* =====================================================
-          SERVICES SECTION
-      ===================================================== */}
+      {/* ================================================================
+          SERVICES
+      ================================================================ */}
 
       <section className="services-section">
+
+        {/* ==============================================================
+            TOOLBAR
+        ============================================================== */}
 
         <div className="services-toolbar">
 
@@ -591,179 +774,218 @@ function Services() {
 
           </div>
 
-
           <ServiceSearch
             searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+            setSearchTerm={
+              setSearchTerm
+            }
           />
 
         </div>
 
-
-        {/* ===================================================
-            CATEGORY FILTERS
-        =================================================== */}
+        {/* ==============================================================
+            DYNAMIC CATEGORIES
+        ============================================================== */}
 
         <div className="category-filters">
 
-          {categories.map((category) => (
-            <ServiceCategoryCard
-              key={category}
-              category={category}
-              activeCategory={activeCategory}
-              onClick={setActiveCategory}
-            />
-          ))}
+          {categories.map(
+            (category) => (
+              <ServiceCategoryCard
+                key={category}
+                category={category}
+                activeCategory={
+                  activeCategory
+                }
+                onClick={
+                  setActiveCategory
+                }
+              />
+            )
+          )}
 
         </div>
 
-
-        {/* ===================================================
+        {/* ==============================================================
             RESULT COUNT
-        =================================================== */}
+        ============================================================== */}
 
         <div className="services-result-row">
 
           <p>
             Showing{" "}
-
             <strong>
-              {filteredServices.length}
+              {
+                filteredServices.length
+              }
             </strong>{" "}
-
             services
           </p>
 
-
           {(searchTerm ||
-            activeCategory !== "All Services") && (
-
+            activeCategory !==
+              "All Services") && (
             <button
               className="clear-filters"
-              onClick={clearFilters}
+              onClick={
+                clearFilters
+              }
             >
               Clear filters
             </button>
-
           )}
 
         </div>
 
+        {/* ==============================================================
+            ERROR STATE
+        ============================================================== */}
 
-        {/* ===================================================
+        {error && (
+          <div className="empty-services">
+
+            <div className="empty-icon">
+              <RefreshCw
+                size={30}
+              />
+            </div>
+
+            <h3>
+              Could not load services
+            </h3>
+
+            <p>
+              {error}
+            </p>
+
+            <button
+              className="primary-btn"
+              onClick={
+                fetchServices
+              }
+            >
+              Try Again
+            </button>
+
+          </div>
+        )}
+
+        {/* ==============================================================
             SERVICE CAROUSEL
-        =================================================== */}
+        ============================================================== */}
 
-        {filteredServices.length > 0 ? (
+        {!error &&
+          filteredServices.length >
+            0 && (
 
           <div
             className="services-marquee"
             ref={carouselRef}
-
-            onWheel={handleWheel}
-
-            onMouseDown={handleMouseDown}
-
-            onMouseMove={handleMouseMove}
-
-            onMouseUp={stopDragging}
-
-            onMouseLeave={stopDragging}
+            onWheel={
+              handleWheel
+            }
+            onMouseDown={
+              handleMouseDown
+            }
+            onMouseMove={
+              handleMouseMove
+            }
+            onMouseUp={
+              stopDragging
+            }
+            onMouseLeave={
+              stopDragging
+            }
           >
 
             <div className="services-marquee-track">
 
-
               {/* FIRST SET */}
 
-              {filteredServices.map((service) => (
+              {filteredServices.map(
+                (service) => (
+                  <div
+                    className="service-marquee-item"
+                    key={`first-${service.id}`}
+                  >
+                    <ServiceCard
+                      service={service}
+                    />
+                  </div>
+                )
+              )}
 
-                <div
-                  className="service-marquee-item"
-                  key={`first-${service.id}`}
-                >
+              {/* SECOND SET
+                  Used for infinite scrolling */}
 
-                  <ServiceCard
-                    service={service}
-                  />
-
-                </div>
-
-              ))}
-
-
-              {/* DUPLICATE SET */}
-
-              {filteredServices.map((service) => (
-
-                <div
-                  className="service-marquee-item"
-                  key={`second-${service.id}`}
-                  aria-hidden="true"
-                >
-
-                  <ServiceCard
-                    service={service}
-                  />
-
-                </div>
-
-              ))}
+              {filteredServices.map(
+                (service) => (
+                  <div
+                    className="service-marquee-item"
+                    key={`second-${service.id}`}
+                    aria-hidden="true"
+                  >
+                    <ServiceCard
+                      service={service}
+                    />
+                  </div>
+                )
+              )}
 
             </div>
 
           </div>
+        )}
 
-        ) : (
+        {/* ==============================================================
+            NO RESULTS
+        ============================================================== */}
 
-          /* =================================================
-             EMPTY STATE
-          ================================================= */
+        {!error &&
+          filteredServices.length ===
+            0 && (
 
           <div className="empty-services">
 
             <div className="empty-icon">
-
-              <Sparkles size={30} />
-
+              <Sparkles
+                size={30}
+              />
             </div>
-
 
             <h3>
               No services found
             </h3>
 
-
             <p>
-              Try adjusting your search or selecting a
-              different category.
+              Try adjusting your search
+              or selecting another
+              category.
             </p>
-
 
             <button
               className="primary-btn"
-              onClick={clearFilters}
+              onClick={
+                clearFilters
+              }
             >
               Clear Filters
             </button>
 
           </div>
-
         )}
 
       </section>
 
-
-      {/* =====================================================
+      {/* ================================================================
           HOW IT WORKS
-      ===================================================== */}
+      ================================================================ */}
 
       <HowItWorks />
 
-
-      {/* =====================================================
+      {/* ================================================================
           CTA
-      ===================================================== */}
+      ================================================================ */}
 
       <section className="services-cta">
 
@@ -773,24 +995,19 @@ function Services() {
             READY TO GET STARTED?
           </span>
 
-
           <h2>
             Have a task in mind?
           </h2>
 
-
           <p>
-            Find the right home service and get your
-            task moving today.
+            Find the right home service
+            and get your task moving
+            today.
           </p>
 
-
           <button className="cta-button">
-
             Browse Services
-
             <ArrowRight size={18} />
-
           </button>
 
         </div>
